@@ -2,7 +2,9 @@ const extract = require('./extract/extract');
 const formatter = require('./transform/formatter');
 const load = require('./load/load');
 const fs = require('fs');
+const cron = require('node-cron');
 
+var lastCron = null;
 const tasksFilePath = './data/tasks.json';
 const tasksFile = JSON.parse(fs.readFileSync(tasksFilePath));
 
@@ -57,4 +59,9 @@ pipeline = async () => {
     })
 }
 
-pipeline();
+cron.schedule('0 * * * *', () => {
+    let date = new Date();
+    console.log(date);
+    pipeline();
+    lastCron = date;
+});

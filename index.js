@@ -14,7 +14,7 @@ const databaseId = secretFile["databaseId"];
 
 pipeline = async () => {
     var notion_task = await extract.getNotionTasks(secret, databaseId);
-    var organizr_task = await extract.getOrganizrTasks();
+    //var organizr_task = await extract.getOrganizrTasks();
 
     var allTask = [];
     tasksFile.forEach(task => allTask.push(task));
@@ -27,7 +27,8 @@ pipeline = async () => {
             load.addOrganizrTask(formated_task).then(newTaskOrganizr => {
                 tasksFile.push({
                     idNotion: taskNotion.id,
-                    idOrganizr: newTaskOrganizr.data.id
+                    idOrganizr: newTaskOrganizr.data.id,
+                    modificationDate: taskNotion?.last_edited_time
                 })
                 fs.writeFileSync(tasksFilePath, '');
                 fs.writeFileSync(tasksFilePath, JSON.stringify(tasksFile));
@@ -40,6 +41,7 @@ pipeline = async () => {
             let idOrganizr = tasksFile.filter(task => task.idNotion == taskNotion.id)[0].idOrganizr;
             formated_task = {
                 id: idOrganizr,
+                modificationDate: taskNotion?.last_edited_time,
                 ...formated_task
             }
             load.updateOrganizrTask(formated_task);
@@ -65,3 +67,5 @@ cron.schedule('0 * * * *', () => {
     pipeline();
     lastCron = date;
 });
+
+pipeline();

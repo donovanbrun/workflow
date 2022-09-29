@@ -1,18 +1,22 @@
+require('dotenv').config();
+
+var express = require('express');
+var app = express();
+
 const extract = require('./extract/extract');
 const formatter = require('./transform/formatter');
 const load = require('./load/load');
 const fs = require('fs');
 const cron = require('node-cron');
 
-var lastCron = null;
+var lastSync = null;
 const tasksFilePath = './data/tasks.json';
 const tasksFile = JSON.parse(fs.readFileSync(tasksFilePath));
 
-const secretFile = JSON.parse(fs.readFileSync("./secrets.json"));
-const secret = secretFile["secret"];
-const databaseId = secretFile["databaseId"];
+const secret = process.env.NOTION_SECRET;
+const databaseId = process.env.NOTION_DB;
 
-pipeline = async () => {
+pipeline1 = async () => {
     var notion_task = await extract.getNotionTasks(secret, databaseId);
     //var organizr_task = await extract.getOrganizrTasks();
 
@@ -64,8 +68,22 @@ pipeline = async () => {
 cron.schedule('0 * * * *', () => {
     let date = new Date();
     console.log(date);
-    pipeline();
-    lastCron = date;
+    pipeline1();
+    lastSync = date;
 });
 
-pipeline();
+app.post('/api/sync', function (req, res) {
+    let date = new Date();
+    console.log(date);
+    pipeline1();
+    lastSync = date;
+    return res.send('Synchronisation started');
+});
+
+app.get('/api/lastsync', function (req, res) {
+    return res.send('Last sync : ' + lastSync);
+});
+
+app.listen('4000', function() {
+    console.log('Server listening on port 4000');
+});

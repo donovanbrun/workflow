@@ -5,6 +5,7 @@ require('dotenv').config();
 const api_url = process.env.ORGANIZR_API;
 
 module.exports= { 
+    
     getNotionTasks: async (secretKey, databaseId) => {
         const notion = new Client({ auth: secretKey });
         const response = await notion.databases.query({ database_id: databaseId }).catch(err => console.log(err));

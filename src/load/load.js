@@ -1,7 +1,7 @@
 const axios = require('axios');
-require('dotenv').config();
+const config = require('../config/config');
 
-const api_url = process.env.ORGANIZR_API;
+const api_url = config.organizr_api
 
 module.exports= {
 

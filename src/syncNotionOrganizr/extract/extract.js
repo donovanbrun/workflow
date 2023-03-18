@@ -1,6 +1,6 @@
 const { Client } = require('@notionhq/client');
 const axios = require('axios');
-const config = require('../config/config')
+const config = require('../../config/config')
 
 const api_url = config.organizr_api
 

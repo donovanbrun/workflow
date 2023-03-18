@@ -1,60 +1,50 @@
-const extract = require('./extract/extract');
-const formatter = require('./transform/formatter');
-const load = require('./load/load');
-const fs = require('fs');
+var express = require('express')
+var app = express()
+const cron = require('node-cron')
 
-const tasksFilePath = './data/tasks.json';
-const tasksFile = JSON.parse(fs.readFileSync(tasksFilePath));
+const test = false
 
-const secretFile = JSON.parse(fs.readFileSync("./secrets.json"));
-const secret = secretFile["secret"];
-const databaseId = secretFile["databaseId"];
+const syncNotionOrganizr = require('./src/syncNotionOrganizr/sync-notion-organizr')
+const onePiece = require('./src/onePiece/one-piece')
 
-pipeline = async () => {
-    var notion_task = await extract.getNotionTasks(secret, databaseId);
-    var organizr_task = await extract.getOrganizrTasks();
+const workflows = [
+    {
+        name: "sync-notion-organizr",
+        description: "Synchronisation of tasks between notion and organizr",
+        workflow: syncNotionOrganizr,
+        cron: '0 * * * *'
+    },
+    {
+        name: "one-piece",
+        description: "Fetch one piece devil fruits and store them in a db",
+        workflow: onePiece,
+        cron: '0 * * * *'
+    },
+]
 
-    var allTask = [];
-    tasksFile.forEach(task => allTask.push(task));
-    
-    notion_task.forEach((taskNotion) => {
-        if (tasksFile.filter(task => task.idNotion == taskNotion.id).length === 0) {
-            // AJOUT TACHE
-            console.log("Ajout idNotion : " + taskNotion.id);
-            let formated_task = formatter.notion2organizr(taskNotion);
-            load.addOrganizrTask(formated_task).then(newTaskOrganizr => {
-                tasksFile.push({
-                    idNotion: taskNotion.id,
-                    idOrganizr: newTaskOrganizr.data.id
-                })
-                fs.writeFileSync(tasksFilePath, '');
-                fs.writeFileSync(tasksFilePath, JSON.stringify(tasksFile));
-            })
-        }
-        else {
-            // MODIFICATION TACHE
-            console.log("Modification idNotion : " + taskNotion.id);
-            let formated_task = formatter.notion2organizr(taskNotion);
-            let idOrganizr = tasksFile.filter(task => task.idNotion == taskNotion.id)[0].idOrganizr;
-            formated_task = {
-                id: idOrganizr,
-                ...formated_task
-            }
-            load.updateOrganizrTask(formated_task);
-        }
+if (!test) {
 
-        allTask.splice(allTask.findIndex(deletedTask => deletedTask.idNotion == taskNotion.id), 1);
-    });
-
-    // SUPPRESSION TACHE
-    allTask.forEach(task => {
-        console.log("Suppression idOrganizr : " + task.idOrganizr);
-        load.deleteOrganizrTask(task.idOrganizr).then(() => {
-            tasksFile.splice(tasksFile.findIndex(t => t.idOrganizr == task.idOrganizr), 1);
-            fs.writeFileSync(tasksFilePath, '');
-            fs.writeFileSync(tasksFilePath, JSON.stringify(tasksFile));
+    workflows.forEach(w => {
+        cron.schedule(w?.cron, () => {
+            w?.workflow?.process()
         })
+        console.log(w?.name + " schedule on : " + w?.cron)
+
+        app.post('/api/' + w?.name, function (req, res) {
+            w?.workflow?.process()
+            return res.send(w?.name + ' started')
+        })
+        console.log(w?.name + " api create on : " + '/api/' + w?.name)
+    })
+
+    app.post('/list/', function (req, res) {
+        return res.send(workflows.map(w => {return {name: w.name, description: w.description}}))
+    })
+    
+    app.listen('4000', function() {
+        console.log('Server listening on port 4000')
     })
 }
-
-pipeline();
+else {
+    onePiece.process()
+}

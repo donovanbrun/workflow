@@ -2,9 +2,14 @@ const axios = require('axios')
 const postgres = require('../utils/postgres')
 
 async function process() {
-    let data = await extract()
-    data = transform(data)
-    await load(data)
+    try {
+        let data = await extract()
+        data = transform(data)
+        await load(data)
+    }
+    catch(e) {
+        console.log(e)
+    }
 }
 
 let extract = async () => {
@@ -24,9 +29,9 @@ let transform = (data) => {
 
 let load = async (data) => {
 
-    await postgres.clearTable("fruit")
+    await postgres.clearTable('findfindnomi', 'fruit')
 
-    let client = await postgres.connect()
+    let client = await postgres.connect('findfindnomi')
 
     for (const fruit of data) {
         await client.query('insert into fruit values ($1, $2, $3)', [fruit.id, fruit.name, fruit.type])

@@ -1,7 +1,15 @@
 require('dotenv').config();
 
 module.exports = {
-    notion_secret: process.env.NOTION_SECRET,
-    notion_database_id: process.env.NOTION_DB,
-    organizr_api: process.env.ORGANIZR_API,
+    test: process.env.TEST,
+    notion: {
+        notion_secret: process.env.NOTION_SECRET,
+        notion_database_id: process.env.NOTION_DB,
+    },
+    postgres: {
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        port: process.env.DB_PORT,
+    }
 }

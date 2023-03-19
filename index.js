@@ -2,6 +2,7 @@ var express = require('express')
 var app = express()
 const cron = require('node-cron')
 const config = require("./src/config/config")
+const log = require("./src/utils/log").log
 
 const test = config.test == "true" ? true : false
 
@@ -27,15 +28,16 @@ if (!test) {
 
     workflows.forEach(w => {
         cron.schedule(w?.cron, () => {
+            log('INFO', w?.name + " started by cron")
             w?.workflow?.process()
         })
-        console.log(w?.name + " schedule on : " + w?.cron)
+        log('INFO', w?.name + " schedule on : " + w?.cron)
 
         app.post('/api/' + w?.name, function (req, res) {
             w?.workflow?.process()
             return res.send(w?.name + ' started')
         })
-        console.log(w?.name + " api create on : " + '/api/' + w?.name)
+        log('INFO', w?.name + " api create on : " + '/api/' + w?.name)
     })
 
     app.post('/list/', function (req, res) {
@@ -43,7 +45,7 @@ if (!test) {
     })
     
     app.listen('4000', function() {
-        console.log('Server listening on port 4000')
+        log('INFO', 'Server listening on port 4000')
     })
 }
 else {

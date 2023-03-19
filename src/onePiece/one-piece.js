@@ -8,7 +8,7 @@ async function process() {
         await load(data)
     }
     catch(e) {
-        console.log(e)
+        log('ERROR', e)
     }
 }
 

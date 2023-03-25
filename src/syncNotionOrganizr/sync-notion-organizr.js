@@ -2,6 +2,7 @@ const config = require('../config/config')
 const { Client } = require('@notionhq/client')
 const postgres = require('../utils/postgres')
 const { v4: uuid } = require('uuid')
+const log = require("../utils/log").log
 
 async function process() {
     try  {
@@ -15,9 +16,9 @@ async function process() {
 }
 
 let extract = async (secretKey, databaseId) => {
-    const notion = new Client({ auth: secretKey });
-    const response = await notion.databases.query({ database_id: databaseId }).catch(err => console.log(err));
-    return response?.results;
+    const notion = new Client({ auth: secretKey })
+    const response = await notion.databases.query({ database_id: databaseId }).catch(err => console.log(err))
+    return response?.results
 }
 
 let transform = (notionTasks) => {
@@ -38,7 +39,6 @@ let transform = (notionTasks) => {
 let load = async (tasks) => {
 
     await postgres.clearTable('postgres', 'notion_task')
-
     let client = await postgres.connect('postgres')
 
     for (const t of tasks) {

@@ -1,10 +1,10 @@
-var express = require('express')
-var app = express()
+const express = require('express')
+const app = express()
 const cron = require('node-cron')
 const config = require("./src/config/config")
 const log = require("./src/utils/log").log
 
-const test = config.test == "true" ? true : false
+const test = config.test == "true"
 
 const syncNotionOrganizr = require('./src/syncNotionOrganizr/sync-notion-organizr')
 const onePiece = require('./src/onePiece/one-piece')
@@ -25,7 +25,6 @@ const workflows = [
 ]
 
 if (!test) {
-
     workflows.forEach(w => {
         cron.schedule(w?.cron, () => {
             log('INFO', w?.name + " started by cron")

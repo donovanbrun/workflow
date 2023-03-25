@@ -1,5 +1,6 @@
 const axios = require('axios')
 const postgres = require('../utils/postgres')
+const log = require("../utils/log").log
 
 async function process() {
     try {
@@ -30,7 +31,6 @@ let transform = (data) => {
 let load = async (data) => {
 
     await postgres.clearTable('findfindnomi', 'fruit')
-
     let client = await postgres.connect('findfindnomi')
 
     for (const fruit of data) {

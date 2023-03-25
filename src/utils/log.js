@@ -1,5 +1,5 @@
 let log = (type, msg) => {
-    console.log('[' + type + '] ' + (new Date()).toISOString() + " : " + msg)
+    console.log((new Date()).toISOString() + ' [' + type + '] ' + msg)
     //write on a log file ?
 }
 

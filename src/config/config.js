@@ -2,6 +2,7 @@ require('dotenv').config();
 
 module.exports = {
     test: process.env.TEST,
+    output: process.env.OUTPUT,
     notion: {
         notion_secret: process.env.NOTION_SECRET,
         notion_database_id: process.env.NOTION_DB,

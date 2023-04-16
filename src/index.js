@@ -1,26 +1,26 @@
 const express = require('express')
 const app = express()
 const cron = require('node-cron')
-const config = require("./src/config/config")
-const log = require("./src/utils/log").log
+const config = require("./config/config")
+const log = require("./utils/log").log
 
 const test = config.test == "true"
 
-const syncNotionOrganizr = require('./src/syncNotionOrganizr/sync-notion-organizr')
-const onePiece = require('./src/onePiece/one-piece')
+const syncNotionOrganizr = require('./syncNotionOrganizr/sync-notion-organizr')
+const onePiece = require('./onePiece/one-piece')
 
 const workflows = [
     {
         name: "sync-notion-organizr",
         description: "Import of notion tasks into organizr database",
         workflow: syncNotionOrganizr,
-        cron: '* * * * *'
+        cron: '*/10 * * * *'
     },
     {
         name: "one-piece",
         description: "Fetch one piece devil fruits and store them in a db",
         workflow: onePiece,
-        cron: '* * * * *'
+        cron: '*/10 * * * *'
     },
 ]
 
@@ -50,5 +50,5 @@ if (!test) {
 else {
     console.log("TEST")
     syncNotionOrganizr.process()
-    onePiece.process()
+    //onePiece.process()
 }

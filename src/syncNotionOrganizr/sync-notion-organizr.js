@@ -1,6 +1,7 @@
 const config = require('../config/config')
 const { Client } = require('@notionhq/client')
 const postgres = require('../utils/postgres')
+const csv = require('../utils/csv')
 const { v4: uuid } = require('uuid')
 const log = require("../utils/log").log
 
@@ -46,6 +47,8 @@ let load = async (tasks) => {
     }
 
     await client.end()
+
+    csv.writeCSV("notion_tasks.csv", ["id", "user_id", "creation_date", "modification_date", "deadline", "description", "name", "status"], tasks)
 }
 
 module.exports= {process}

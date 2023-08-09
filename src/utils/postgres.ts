@@ -1,7 +1,7 @@
 const { Client } = require('pg')
-const config = require('../config/config')
+import { config } from "../config/config";
 
-async function connect(database) {
+export async function connect(database: string) {
     let client = new Client({
         user: config.postgres.user,
         password: config.postgres.password,
@@ -13,10 +13,8 @@ async function connect(database) {
     return client
 }
 
-async function clearTable (database, name) {
-    let client = await this.connect(database)
+export async function clearTable (database: string, name: string) {
+    let client = await connect(database)
     await client.query('delete from ' + [name])
     await client.end()
 }
-
-module.exports = { connect, clearTable }

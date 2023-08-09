@@ -1,15 +1,13 @@
-const config = require('../config/config')
-const fs = require("fs")
+import { config } from "../config/config";
+import fs from 'fs';
 const { stringify } = require("csv-stringify")
 
-function writeCSV(filename, columns, data) {
+export function writeCSV(filename: string, columns: string[], data: any) {
     const writableStream = fs.createWriteStream(config.output + filename)
     const stringifier = stringify({ header: true, columns: columns })
-    data.forEach(element => {
+    data.forEach((element: any) => {
         stringifier.write(element)
     });
 
     stringifier.pipe(writableStream)
 }
-
-module.exports = { writeCSV }

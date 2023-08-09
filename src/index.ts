@@ -1,13 +1,13 @@
-const express = require('express')
-const app = express()
-const cron = require('node-cron')
-const config = require("./config/config")
-const log = require("./utils/log").log
+import express from 'express';
+const app = express();
+import cron from 'node-cron';
+import { config } from "./config/config";
+import { log } from "./utils/log";
 
 const test = config.test == "true"
 
-const syncNotionOrganizr = require('./syncNotionOrganizr/sync-notion-organizr')
-const onePiece = require('./onePiece/one-piece')
+import * as syncNotionOrganizr from './syncNotionOrganizr/sync-notion-organizr';
+import * as onePiece from './onePiece/one-piece';
 
 const workflows = [
     {
@@ -32,14 +32,14 @@ if (!test) {
         })
         log('INFO', w?.name + " schedule on : " + w?.cron)
 
-        app.post('/api/' + w?.name, function (req, res) {
+        app.post('/api/' + w?.name, function (req: any, res: any) {
             w?.workflow?.process()
             return res.send(w?.name + ' started')
         })
         log('INFO', w?.name + " api create on : " + '/api/' + w?.name)
     })
 
-    app.post('/list/', function (req, res) {
+    app.post('/list/', function (req: any, res: any) {
         return res.send(workflows.map(w => {return {name: w.name, description: w.description}}))
     })
     
@@ -48,7 +48,9 @@ if (!test) {
     })
 }
 else {
-    console.log("TEST")
-    syncNotionOrganizr.process()
-    //onePiece.process()
+    console.log("TEST");
+    syncNotionOrganizr.process();
+    onePiece.process();
 }
+
+module.exports = {};

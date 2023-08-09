@@ -1,14 +1,17 @@
-const axios = require('axios')
-const postgres = require('../utils/postgres')
-const log = require("../utils/log").log
+import DevilFruitApi from "../model/DevilFruitApi";
 
-async function process() {
+import axios from "axios";
+import * as postgres from "../utils/postgres";
+import { log } from "../utils/log";
+import DevilFruit from "../model/DevilFruit";
+
+export async function process() {
     try {
         let data = await extract()
         data = transform(data)
         await load(data)
     }
-    catch(e) {
+    catch(e: any) {
         log('ERROR', e)
     }
 }
@@ -18,7 +21,7 @@ let extract = async () => {
     return response?.data
 }
 
-let transform = (data) => {
+let transform = (data: DevilFruitApi[]): DevilFruit[] => {
     return data.map((fruit) => {
         return {
             id : fruit?.id,
@@ -28,7 +31,7 @@ let transform = (data) => {
     })
 }
 
-let load = async (data) => {
+let load = async (data: DevilFruit[]) => {
 
     await postgres.clearTable('findfindnomi', 'fruit')
     let client = await postgres.connect('findfindnomi')

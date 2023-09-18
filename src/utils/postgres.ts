@@ -9,11 +9,11 @@ export async function connect(database: string) {
         port: config.postgres.port,
         database: database
     })
-    await client.connect()
+    await client.connect().catch((err: any) => { throw err })
     return client
 }
 
-export async function clearTable (database: string, name: string) {
+export async function clearTable(database: string, name: string) {
     let client = await connect(database)
     await client.query('delete from ' + [name])
     await client.end()

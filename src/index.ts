@@ -1,13 +1,13 @@
 import express from 'express';
-const app = express();
 import cron from 'node-cron';
 import { config } from "./config/config";
+import * as onePiece from './onePiece/one-piece';
+import * as optc from './optc/one-piece-treasure-cruise';
+import * as syncNotionOrganizr from './syncNotionOrganizr/sync-notion-organizr';
 import { log } from "./utils/log";
 
-const test = config.test == "true"
-
-import * as syncNotionOrganizr from './syncNotionOrganizr/sync-notion-organizr';
-import * as onePiece from './onePiece/one-piece';
+const app = express();
+const test = config.test == "true";
 
 const workflows = [
     {
@@ -22,9 +22,19 @@ const workflows = [
         workflow: onePiece,
         cron: '*/10 * * * *'
     },
+    {
+        name: "one-piece-treasure-cruise",
+        description: "Fetch one piece characters and store to a json file and to mongodb",
+        workflow: optc,
+        cron: '*/10 * * * *'
+    },
 ]
 
-if (!test) {
+if (test) {
+    console.log("TEST");
+    testAll();
+}
+else {
     workflows.forEach(w => {
         cron.schedule(w?.cron, () => {
             log('INFO', w?.name + " started by cron")
@@ -40,17 +50,18 @@ if (!test) {
     })
 
     app.post('/list/', function (req: any, res: any) {
-        return res.send(workflows.map(w => {return {name: w.name, description: w.description}}))
+        return res.send(workflows.map(w => { return { name: w.name, description: w.description } }))
     })
-    
-    app.listen('4000', function() {
+
+    app.listen('4000', function () {
         log('INFO', 'Server listening on port 4000')
     })
 }
-else {
-    console.log("TEST");
-    syncNotionOrganizr.process();
-    onePiece.process();
+
+async function testAll() {
+    await syncNotionOrganizr.process();
+    await onePiece.process();
+    await optc.process();
 }
 
 module.exports = {};

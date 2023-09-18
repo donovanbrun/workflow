@@ -1,6 +1,6 @@
 import { config } from "../config/config";
 import fs from 'fs';
-const { stringify } = require("csv-stringify")
+import { stringify } from 'csv-stringify';
 
 export function writeCSV(filename: string, columns: string[], data: any) {
     const writableStream = fs.createWriteStream(config.output + filename)

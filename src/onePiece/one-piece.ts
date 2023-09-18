@@ -1,18 +1,20 @@
 import DevilFruitApi from "../model/DevilFruitApi";
 
 import axios from "axios";
-import * as postgres from "../utils/postgres";
-import { log } from "../utils/log";
 import DevilFruit from "../model/DevilFruit";
+import { log } from "../utils/log";
+import * as postgres from "../utils/postgres";
 
 export async function process() {
     try {
         let data = await extract()
         data = transform(data)
         await load(data)
+        log("INFO", "one-piece done");
     }
-    catch(e: any) {
-        log('ERROR', e)
+    catch (e: any) {
+        log("ERROR", "one-piece failed");
+        log('ERROR', e);
     }
 }
 
@@ -24,7 +26,7 @@ let extract = async () => {
 let transform = (data: DevilFruitApi[]): DevilFruit[] => {
     return data.map((fruit) => {
         return {
-            id : fruit?.id,
+            id: fruit?.id,
             name: fruit?.roman_name,
             type: fruit?.type
         }

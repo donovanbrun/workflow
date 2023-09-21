@@ -9,23 +9,23 @@ import { log } from "./utils/log";
 const app = express();
 const test = config.test == "true";
 
-const workflows = [
+const pipelines = [
     {
         name: "sync-notion-organizr",
         description: "Import of notion tasks into organizr database",
-        workflow: syncNotionOrganizr,
+        process: syncNotionOrganizr,
         cron: '*/10 * * * *'
     },
     {
         name: "one-piece",
         description: "Fetch one piece devil fruits and store them in a db",
-        workflow: onePiece,
+        process: onePiece,
         cron: '*/10 * * * *'
     },
     {
         name: "one-piece-treasure-cruise",
         description: "Fetch one piece characters and store to a json file and to mongodb",
-        workflow: optc,
+        process: optc,
         cron: '*/10 * * * *'
     },
 ]
@@ -35,22 +35,22 @@ if (test) {
     testAll();
 }
 else {
-    workflows.forEach(w => {
-        cron.schedule(w?.cron, () => {
-            log('INFO', w?.name + " started by cron")
-            w?.workflow?.process()
+    pipelines.forEach(pipeline => {
+        cron.schedule(pipeline?.cron, () => {
+            log('INFO', pipeline?.name + " started by cron")
+            pipeline?.process?.process()
         })
-        log('INFO', w?.name + " schedule on : " + w?.cron)
+        log('INFO', pipeline?.name + " schedule on : " + pipeline?.cron)
 
-        app.post('/api/' + w?.name, function (req: any, res: any) {
-            w?.workflow?.process()
-            return res.send(w?.name + ' started')
+        app.post('/api/' + pipeline?.name, function (req: any, res: any) {
+            pipeline?.process?.process()
+            return res.send(pipeline?.name + ' started')
         })
-        log('INFO', w?.name + " api create on : " + '/api/' + w?.name)
+        log('INFO', pipeline?.name + " api create on : " + '/api/' + pipeline?.name)
     })
 
     app.post('/list/', function (req: any, res: any) {
-        return res.send(workflows.map(w => { return { name: w.name, description: w.description } }))
+        return res.send(pipelines.map(pipeline => { return { name: pipeline.name, description: pipeline.description } }))
     })
 
     app.listen('4000', function () {

@@ -1,10 +1,10 @@
 import { Client } from "@notionhq/client";
 import { v4 as uuid } from "uuid";
 import { config } from "../config/config";
-import Task from "../model/task";
 import * as csv from "../utils/csv";
 import { log } from "../utils/log";
 import * as postgres from "../utils/postgres";
+import Task from "./model/task";
 
 export async function process() {
     try {

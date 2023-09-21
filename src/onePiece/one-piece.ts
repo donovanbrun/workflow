@@ -1,9 +1,8 @@
-import DevilFruitApi from "../model/DevilFruitApi";
-
 import axios from "axios";
-import DevilFruit from "../model/DevilFruit";
 import { log } from "../utils/log";
 import * as postgres from "../utils/postgres";
+import DevilFruit from "./model/DevilFruit";
+import DevilFruitApi from "./model/DevilFruitApi";
 
 export async function process() {
     try {

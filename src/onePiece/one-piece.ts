@@ -32,13 +32,15 @@ export default class OnePiece implements Pipeline {
     }
 
     transform(data: DevilFruitApi[]): DevilFruit[] {
-        return data.map((fruit) => {
+        const res = data.map((fruit) => {
             return {
                 id: fruit?.id,
                 name: fruit?.roman_name,
                 type: fruit?.type
             }
         })
+        log("INFO", `Transformed ${res.length} devil fruits`);
+        return res;
     }
 
     async load(data: DevilFruit[]) {

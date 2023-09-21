@@ -31,14 +31,32 @@ export default class syncNotionOrganizr implements Pipeline {
 
     async extract(secretKey: string, databaseId: string) {
         const notion = new Client({ auth: secretKey });
-        const res = await notion.databases
-            .query({ database_id: databaseId });
-        return res.results;
+        let tasks: any[] = [];
+        let res: any;
+        do {
+            res = await notion.databases
+                .query(
+                    {
+                        database_id: databaseId,
+                        start_cursor: res?.next_cursor,
+                        sorts: [
+                            {
+                                "property": "ID",
+                                "direction": "ascending"
+                            }
+                        ]
+                    }
+                );
+            log("INFO", `Extracted : ${res.results.length} tasks`);
+            tasks = tasks.concat(res.results);
+        } while (res?.has_more);
+        log("INFO", `Total extracted : ${tasks.length} tasks`);
+        return tasks;
     }
 
     transform(notionTasks: any): Task[] {
         const ingestionDate = new Date();
-        return notionTasks.map((t: any) => {
+        const res = notionTasks.map((t: any) => {
             return {
                 id: uuid(),
                 userId: undefined,
@@ -51,6 +69,8 @@ export default class syncNotionOrganizr implements Pipeline {
                 ingestionDate,
             };
         });
+        log("INFO", `Transformed ${res.length} tasks`);
+        return res;
     }
 
     async load(tasks: Task[]) {

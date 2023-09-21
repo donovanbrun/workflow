@@ -62,7 +62,7 @@ export default class OnePieceTreasureCruise implements Pipeline {
         let res: any[] = [];
         characters.forEach((character, i) => {
             res.push({
-                id: i + 1,
+                _id: i + 1,
                 name: character[0],
                 rank: character[3],
                 img: "https://raw.githubusercontent.com/optc-db/optc-db.github.io/master/api/images/full/transparent" + idToLink(i + 1),

@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-export const config = {
+export const globalConfig: any = {
     test: process.env.TEST ?? true,
     output: process.env.OUTPUT ?? './data/',
     notion: {

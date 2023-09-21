@@ -1,10 +1,7 @@
 import { MongoClient } from 'mongodb';
-import { config } from '../config/config';
 
-const url = `${config.mongodb.url}`;
-
-export async function insertMany(data: any[], dbName: string, collectionName: string) {
-    const client = await MongoClient.connect(url)
+export async function insertMany(config: any, data: any[], dbName: string, collectionName: string) {
+    const client = await MongoClient.connect(config.mongodb.url)
 
     const db = client.db(dbName);
     const collection = db.collection(collectionName);
@@ -13,8 +10,8 @@ export async function insertMany(data: any[], dbName: string, collectionName: st
     client.close();
 }
 
-export async function clearCollection(dbName: string, collectionName: string) {
-    const client = await MongoClient.connect(url)
+export async function clearCollection(config: any, dbName: string, collectionName: string) {
+    const client = await MongoClient.connect(config.mongodb.url)
 
     const db = client.db(dbName);
     const collection = db.collection(collectionName);

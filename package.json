@@ -9,7 +9,7 @@
     "dev": "tsc && node build/index.js",
     "build": "tsc"
   },
-  "author": "",
+  "author": "Donovan Brun",
   "license": "ISC",
   "dependencies": {
     "@notionhq/client": "^2.2.2",

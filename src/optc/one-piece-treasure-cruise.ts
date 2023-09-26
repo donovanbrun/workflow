@@ -1,5 +1,6 @@
 import axios from "axios";
 import Pipeline from "../Pipeline";
+import * as csv from "../utils/csv";
 import { log } from "../utils/log";
 import * as mongodb from "../utils/mongodb";
 
@@ -82,7 +83,19 @@ export default class OnePieceTreasureCruise implements Pipeline {
         }
 
         const fs = require('fs');
-        fs.writeFileSync('data/characters.json', JSON.stringify(characters), 'utf-8');
+        fs.writeFileSync(this.config.output + 'characters.json', JSON.stringify(characters), 'utf-8');
+
+        csv.writeCSV(
+            this.config,
+            "characters.csv",
+            [
+                "_id",
+                "name",
+                "rank",
+                "img",
+            ],
+            characters
+        );
 
         await mongodb.clearCollection(this.config, 'optc', 'characters');
         return await mongodb.insertMany(this.config, characters, 'optc', 'characters');

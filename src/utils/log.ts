@@ -7,7 +7,8 @@ function getLogFilename() {
 
 function writeLog(msg: string) {
     try {
-        var logStream = fs.createWriteStream(getLogFilename(), {flags: 'a+'});
+        // TODO async
+        var logStream = fs.createWriteStream(getLogFilename(), { flags: 'a+' });
         logStream.write(msg + '\n');
         logStream.end();
     }

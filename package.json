@@ -2,20 +2,23 @@
   "name": "workflow",
   "version": "1.0.0",
   "description": "",
-  "main": "src/index.ts",
+  "main": "build/index.js",
+  "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsc && node build/index.js"
+    "dev": "tsc && node build/index.js",
+    "build": "tsc"
   },
-  "author": "",
+  "author": "Donovan Brun",
   "license": "ISC",
   "dependencies": {
-    "@notionhq/client": "^1.0.1",
+    "@notionhq/client": "^2.2.2",
     "axios": "^0.27.2",
     "csv": "^6.2.8",
     "dotenv": "^16.0.2",
     "express": "^4.18.1",
     "fs": "^0.0.1-security",
+    "mongodb": "^5.7.0",
     "node-cron": "^3.0.2",
     "pg": "^8.10.0",
     "typescript": "^5.1.6",
@@ -23,8 +26,10 @@
   },
   "devDependencies": {
     "@types/express": "^4.17.17",
+    "@types/jsdom": "^21.1.1",
     "@types/node": "^20.4.1",
     "@types/node-cron": "^3.0.8",
+    "@types/puppeteer": "^7.0.4",
     "@types/uuid": "^9.0.2"
   }
 }

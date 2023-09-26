@@ -3,3 +3,4 @@ package-lock.json
 data
 .env
 build
+logs

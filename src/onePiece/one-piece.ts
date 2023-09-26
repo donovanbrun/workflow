@@ -1,46 +1,57 @@
-import DevilFruitApi from "../model/DevilFruitApi";
-
 import axios from "axios";
-import * as postgres from "../utils/postgres";
+import Pipeline from "../Pipeline";
 import { log } from "../utils/log";
-import DevilFruit from "../model/DevilFruit";
+import * as postgres from "../utils/postgres";
+import DevilFruit from "./model/DevilFruit";
+import DevilFruitApi from "./model/DevilFruitApi";
 
-export async function process() {
-    try {
-        let data = await extract()
-        data = transform(data)
-        await load(data)
+export default class OnePiece implements Pipeline {
+
+    config;
+
+    constructor(config: any) {
+        this.config = config;
     }
-    catch(e: any) {
-        log('ERROR', e)
-    }
-}
 
-let extract = async () => {
-    const response = await axios.get("https://api.api-onepiece.com/fruits")
-    return response?.data
-}
-
-let transform = (data: DevilFruitApi[]): DevilFruit[] => {
-    return data.map((fruit) => {
-        return {
-            id : fruit?.id,
-            name: fruit?.roman_name,
-            type: fruit?.type
+    async process() {
+        try {
+            let data = await this.extract()
+            data = this.transform(data)
+            await this.load(data)
+            log("INFO", "one-piece done");
         }
-    })
-}
-
-let load = async (data: DevilFruit[]) => {
-
-    await postgres.clearTable('findfindnomi', 'fruit')
-    let client = await postgres.connect('findfindnomi')
-
-    for (const fruit of data) {
-        await client.query('insert into fruit values ($1, $2, $3)', [fruit.id, fruit.name, fruit.type])
+        catch (e: any) {
+            log("ERROR", "one-piece failed");
+            log('ERROR', e);
+        }
     }
 
-    await client.end()
-}
+    async extract() {
+        const response = await axios.get("https://api.api-onepiece.com/fruits")
+        return response?.data
+    }
 
-module.exports = { process };
+    transform(data: DevilFruitApi[]): DevilFruit[] {
+        const res = data.map((fruit) => {
+            return {
+                id: fruit?.id,
+                name: fruit?.roman_name,
+                type: fruit?.type
+            }
+        })
+        log("INFO", `Transformed ${res.length} devil fruits`);
+        return res;
+    }
+
+    async load(data: DevilFruit[]) {
+
+        await postgres.clearTable(this.config, 'findfindnomi', 'fruit')
+        let client = await postgres.connect(this.config, 'findfindnomi')
+
+        for (const fruit of data) {
+            await client.query('insert into fruit values ($1, $2, $3)', [fruit.id, fruit.name, fruit.type])
+        }
+
+        await client.end()
+    }
+}

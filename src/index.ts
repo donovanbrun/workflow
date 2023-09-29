@@ -10,6 +10,17 @@ import { log } from "./utils/log";
 const app = express();
 const test = globalConfig.test == "true";
 
+// Basic auth
+app.use((req, res, next) => {
+    const auth = { login: globalConfig.auth.login, password: globalConfig.auth.password }
+    const b64auth = (req.headers.authorization || '').split(' ')[1] || ''
+    const [login, password] = Buffer.from(b64auth, 'base64').toString().split(':')
+    if (login && password && login === auth.login && password === auth.password) {
+        return next()
+    }
+    res.sendStatus(401);
+})
+
 const pipelines: { name: string, description: string, process: new (config: any) => Pipeline, cron: string, config: any }[] = [
     {
         name: "sync-notion-organizr",
@@ -54,7 +65,7 @@ else {
         log('INFO', pipeline?.name + " api create on : " + '/api/' + pipeline?.name)
     })
 
-    app.post('/list/', function (req: any, res: any) {
+    app.get('/list/', function (req: any, res: any) {
         return res.send(pipelines.map(pipeline => { return { name: pipeline.name, description: pipeline.description } }))
     })
 

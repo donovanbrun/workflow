@@ -15,5 +15,9 @@ export const globalConfig: any = {
     },
     mongodb: {
         url: process.env.MONGO_URL ?? "mongodb://localhost:27017",
-    }
-}
+    },
+    auth: {
+        login: process.env.AUTH_LOGIN ?? "",
+        password: process.env.AUTH_PASSWORD ?? "",
+    },
+};

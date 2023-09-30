@@ -17,3 +17,10 @@ export async function clearTable(config: any, database: string, name: string) {
     await client.query('delete from ' + [name])
     await client.end()
 }
+
+export async function getTable(config: any, database: string, name: string) {
+    let client = await connect(config, database)
+    const res = await client.query('select * from ' + [name])
+    await client.end()
+    return res.rows
+}

@@ -19,3 +19,15 @@ export async function clearCollection(config: any, dbName: string, collectionNam
     await collection.deleteMany({});
     client.close();
 }
+
+export async function fetchCollection(config: any, dbName: string, collectionName: string) {
+    const client = await MongoClient.connect(config.mongodb.url)
+
+    const db = client.db(dbName);
+    const collection = db.collection(collectionName);
+
+    const res = await collection.find().toArray();
+    client.close();
+
+    return res;
+}

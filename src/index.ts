@@ -10,6 +10,9 @@ import { log } from "./utils/log";
 const app = express();
 const test = globalConfig.test == "true";
 
+const router = express.Router();
+app.use(router);
+
 // Basic auth
 app.use((req, res, next) => {
     const auth = { login: globalConfig.auth.login, password: globalConfig.auth.password }
@@ -21,26 +24,32 @@ app.use((req, res, next) => {
     res.sendStatus(401);
 })
 
-const pipelines: { name: string, description: string, process: new (config: any) => Pipeline, cron: string, config: any }[] = [
+const pipelines: { name: string, description: string, process: new (config: any) => Pipeline, controller: any, path: string, cron: string, config: any }[] = [
     {
         name: "sync-notion-organizr",
         description: "Import of notion tasks into organizr database",
         process: SyncNotionOrganizr,
-        cron: '*/10 * * * *',
+        controller: require('./syncNotionOrganizr/controller'),
+        path: "/api/get/tasks",
+        cron: '* 0 * * *',
         config: globalConfig
     },
     {
         name: "one-piece",
         description: "Fetch one piece devil fruits and store them in a db",
         process: OnePiece,
-        cron: '*/10 * * * *',
+        controller: null,
+        path: "",
+        cron: '* 0 * * *',
         config: globalConfig
     },
     {
         name: "one-piece-treasure-cruise",
         description: "Fetch one piece characters and store to a json file and to mongodb",
         process: OnePieceTreasureCruise,
-        cron: '*/10 * * * *',
+        controller: require('./optc/controller'),
+        path: "/api/get/optc",
+        cron: '* 0 * * *',
         config: globalConfig
     },
 ]
@@ -63,10 +72,21 @@ else {
             return res.send(pipeline?.name + ' started')
         })
         log('INFO', pipeline?.name + " api create on : " + '/api/' + pipeline?.name)
+
+        if (pipeline?.controller) {
+            router.use(pipeline?.path, pipeline?.controller);
+        }
     })
 
     app.get('/list/', function (req: any, res: any) {
-        return res.send(pipelines.map(pipeline => { return { name: pipeline.name, description: pipeline.description } }))
+        return res.send(pipelines.map(pipeline => {
+            return {
+                name: pipeline.name,
+                description: pipeline.description,
+                pipeline: '/api/' + pipeline.name,
+                controller: pipeline.path,
+            }
+        }))
     })
 
     app.listen('4000', function () {

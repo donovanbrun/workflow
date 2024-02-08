@@ -7,10 +7,11 @@ function getLogFilename() {
 
 function writeLog(msg: string) {
     try {
-        // TODO async
-        var logStream = fs.createWriteStream(getLogFilename(), { flags: 'a+' });
-        logStream.write(msg + '\n');
-        logStream.end();
+        fs.writeFile(getLogFilename(), msg + '\n', { flag: 'a+' }, function (err) {
+            if (err) {
+                console.error(err);
+            }
+        });
     }
     catch (err) {
         console.error(err);

@@ -1,43 +1,22 @@
 import { Client } from "@notionhq/client";
-import { v4 as uuid } from "uuid";
-import Pipeline from "../Pipeline";
-import * as csv from "../utils/csv";
-import { log } from "../utils/log";
-import * as postgres from "../utils/postgres";
+import { Configuration, Extractor, Loader, Pipeline, Transformer, csv, log, postgres } from "workflow-etl";
 import Task from "./model/task";
 
-export default class syncNotionOrganizr implements Pipeline {
+class CustomExtractor extends Extractor<any> {
 
-    config;
-
-    constructor(config: any) {
-        this.config = config;
+    constructor(config: Configuration) {
+        super(config);
     }
 
-    async process() {
-        try {
-            var notion_tasks = await this.extract(
-                this.config.notion.notion_secret,
-                this.config.notion.notion_database_id
-            ).catch((err: any) => { throw err; });
-            var tasks = this.transform(notion_tasks);
-            await this.load(tasks).catch((err: any) => { throw err; });
-            log("INFO", "sync-notion-organizr done");
-        } catch (e: any) {
-            log("ERROR", "sync-notion-organizr failed");
-            log("ERROR", e);
-        }
-    }
-
-    async extract(secretKey: string, databaseId: string) {
-        const notion = new Client({ auth: secretKey });
+    async extract(): Promise<any[]> {
+        const notion = new Client({ auth: this.config.notion.notion_secret });
         let tasks: any[] = [];
         let res: any;
         do {
             res = await notion.databases
                 .query(
                     {
-                        database_id: databaseId,
+                        database_id: this.config.notion.notion_database_id,
                         start_cursor: res?.next_cursor,
                         sorts: [
                             {
@@ -53,13 +32,15 @@ export default class syncNotionOrganizr implements Pipeline {
         log("INFO", `Total extracted : ${tasks.length} tasks`);
         return tasks;
     }
+}
 
-    transform(notionTasks: any): Task[] {
+class CustomTransformer extends Transformer<any, Task> {
+    transform(notionTasks: any[]): Task[] {
         const ingestionDate = new Date();
         const res = notionTasks.map((t: any) => {
             return {
-                id: uuid(),
-                userId: undefined,
+                id: t?.id,
+                userId: t?.created_by?.id,
                 creationDate: t?.created_time,
                 modificationDate: t?.last_edited_time,
                 name: t.properties?.Nom?.title[0]?.plain_text,
@@ -72,14 +53,18 @@ export default class syncNotionOrganizr implements Pipeline {
         log("INFO", `Transformed ${res.length} tasks`);
         return res;
     }
+}
+
+class CustomLoaderDB extends Loader<Task> {
+
+    constructor(config: Configuration) {
+        super(config);
+    }
 
     async load(tasks: Task[]) {
-        let client = await postgres.connect(this.config, "postgres").catch((err: any) => {
-            throw err;
-        });
-        await postgres.clearTable(this.config, "postgres", "notion_task").catch((err: any) => {
-            throw err;
-        });
+
+        await postgres.clearTable(this.config, "postgres", "notion_task");
+        let client = await postgres.connect(this.config, "postgres");
 
         for (const t of tasks) {
             await client.query(
@@ -99,7 +84,16 @@ export default class syncNotionOrganizr implements Pipeline {
         }
 
         await client.end();
+    }
+}
 
+class CustomLoaderCSV extends Loader<Task> {
+
+    constructor(config: any) {
+        super(config);
+    }
+
+    async load(tasks: Task[]) {
         csv.writeCSV(
             this.config,
             "notion_tasks.csv",
@@ -112,10 +106,31 @@ export default class syncNotionOrganizr implements Pipeline {
                 "description",
                 "name",
                 "status",
+                "ingestion_date"
             ],
             tasks
         );
+    }
+}
 
-        return true;
-    };
+export default class syncNotionOrganizr extends Pipeline<any, Task> {
+
+    getExtractors(): Extractor<any>[] {
+        return [
+            new CustomExtractor(this.config),
+        ];
+    }
+
+    getTransformers(): Transformer<any, Task>[] {
+        return [
+            new CustomTransformer(this.config),
+        ];
+    }
+
+    getLoaders(): Loader<Task>[] {
+        return [
+            new CustomLoaderDB(this.config),
+            new CustomLoaderCSV(this.config),
+        ];
+    }
 }

@@ -1,11 +1,11 @@
 import { Router } from "express";
+import { log, mongodb } from "workflow-etl";
 import { globalConfig } from "../config/global";
-import { log } from "../utils/log";
-import * as mongodb from "../utils/mongodb";
 
 const router = Router();
 
 router.get('/', function (req, res) {
+    log("INFO", "GET optc characters");
     try {
         mongodb.fetchCollection(globalConfig, "optc", "characters").then((data) => {
             return res.send(data);

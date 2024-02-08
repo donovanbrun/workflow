@@ -1,34 +1,18 @@
 import axios from "axios";
-import Pipeline from "../Pipeline";
-import * as csv from "../utils/csv";
-import { log } from "../utils/log";
-import * as mongodb from "../utils/mongodb";
+import { Configuration, Extractor, Loader, Pipeline, Transformer, csv, log, mongodb } from "workflow-etl";
 
-export default class OnePieceTreasureCruise implements Pipeline {
+class CustomExtractor extends Extractor<any> {
 
-    config;
-
-    constructor(config: any) {
-        this.config = config;
+    constructor(config: Configuration) {
+        super(config);
     }
 
-    async process() {
-        try {
-            const characters = await this.extract("https://raw.githubusercontent.com/optc-db/optc-db.github.io/master/common/data/units.js");
-            const transformedCharacters = this.transform(characters);
-            await this.load(transformedCharacters);
-            log("INFO", "one-piece-treasure-cruise done");
-        }
-        catch (e: any) {
-            log("ERROR", "one-piece-treasure-cruise failed");
-            log("ERROR", e);
-        }
-    }
-
-    async extract(url: string): Promise<any[]> {
-        const data: string = await axios.get(url).then((res) => res.data).catch((e) => {
-            console.log(e);
-        })
+    async extract(): Promise<any[]> {
+        const data: string = await axios.get("https://raw.githubusercontent.com/optc-db/optc-db.github.io/master/common/data/units.js")
+            .then((res) => res.data)
+            .catch((e) => {
+                console.log(e);
+            })
 
         let startIndex = data.indexOf("window.units = [") + 15;
         let endIndex = data.indexOf("var calcGhostStartID");
@@ -49,9 +33,10 @@ export default class OnePieceTreasureCruise implements Pipeline {
 
         return JSON.parse(res);
     }
+}
 
+class CustomTransformer extends Transformer<any, any> {
     transform(characters: any[]): any[] {
-
         function idToLink(id: number) {
             const idStr = String(id).padStart(4, '0');
             const firstSegment = Math.floor(id / 1000);
@@ -76,6 +61,13 @@ export default class OnePieceTreasureCruise implements Pipeline {
 
         return res;
     }
+}
+
+class CustomLoader extends Loader<any> {
+
+    constructor(config: Configuration) {
+        super(config);
+    }
 
     async load(characters: any[]) {
         if (characters.length === 0) {
@@ -99,5 +91,26 @@ export default class OnePieceTreasureCruise implements Pipeline {
 
         await mongodb.clearCollection(this.config, 'optc', 'characters');
         return await mongodb.insertMany(this.config, characters, 'optc', 'characters');
+    }
+}
+
+export default class OnePieceTreasureCruise extends Pipeline<any, any> {
+
+    getExtractors(): Extractor<any>[] {
+        return [
+            new CustomExtractor(this.config)
+        ];
+    }
+
+    getTransformers(): Transformer<any, any>[] {
+        return [
+            new CustomTransformer(this.config)
+        ];
+    }
+
+    getLoaders(): Loader<any>[] {
+        return [
+            new CustomLoader(this.config)
+        ];
     }
 }

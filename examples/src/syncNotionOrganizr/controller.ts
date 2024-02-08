@@ -1,12 +1,12 @@
 import { Router } from "express";
+import { log, postgres } from "workflow-etl";
 import { globalConfig } from "../config/global";
-import { log } from "../utils/log";
-import * as postgres from "../utils/postgres";
 import Task from "./model/task";
 
 const router = Router();
 
 router.get('/', async function (req, res) {
+    log("INFO", "GET tasks");
     try {
         let results = await postgres.getTable(globalConfig, "postgres", "notion_task");
         const tasks: Task[] = results.map((t: any) => {

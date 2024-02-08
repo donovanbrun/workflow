@@ -1,36 +1,21 @@
 import axios from "axios";
-import Pipeline from "../Pipeline";
-import { log } from "../utils/log";
-import * as postgres from "../utils/postgres";
+import { Configuration, Extractor, Loader, Pipeline, Transformer as Transformer_, log, postgres } from "workflow-etl";
 import DevilFruit from "./model/DevilFruit";
 import DevilFruitApi from "./model/DevilFruitApi";
 
-export default class OnePiece implements Pipeline {
+class CustomExtractor extends Extractor<DevilFruitApi> {
 
-    config;
-
-    constructor(config: any) {
-        this.config = config;
+    constructor(config: Configuration) {
+        super(config);
     }
 
-    async process() {
-        try {
-            let data = await this.extract()
-            data = this.transform(data)
-            await this.load(data)
-            log("INFO", "one-piece done");
-        }
-        catch (e: any) {
-            log("ERROR", "one-piece failed");
-            log('ERROR', e);
-        }
-    }
-
-    async extract() {
+    async extract(): Promise<DevilFruitApi[]> {
         const response = await axios.get("https://api.api-onepiece.com/fruits")
         return response?.data
     }
+}
 
+class CustomTransformer extends Transformer_<DevilFruitApi, DevilFruit> {
     transform(data: DevilFruitApi[]): DevilFruit[] {
         const res = data.map((fruit) => {
             return {
@@ -41,6 +26,13 @@ export default class OnePiece implements Pipeline {
         })
         log("INFO", `Transformed ${res.length} devil fruits`);
         return res;
+    }
+}
+
+class CustomLoader extends Loader<DevilFruit> {
+
+    constructor(config: Configuration) {
+        super(config);
     }
 
     async load(data: DevilFruit[]) {
@@ -53,5 +45,26 @@ export default class OnePiece implements Pipeline {
         }
 
         await client.end()
+    }
+}
+
+export default class OnePiece extends Pipeline<DevilFruitApi, DevilFruit> {
+
+    getExtractors(): Extractor<DevilFruitApi>[] {
+        return [
+            new CustomExtractor(this.config)
+        ];
+    }
+
+    getTransformers(): any[] {
+        return [
+            new CustomTransformer(this.config)
+        ];
+    }
+
+    getLoaders(): Loader<DevilFruit>[] {
+        return [
+            new CustomLoader(this.config)
+        ];
     }
 }

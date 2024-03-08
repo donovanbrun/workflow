@@ -1,20 +1,17 @@
 import axios from "axios";
 import { log } from "../../utils/log";
-import Configuration from "../Configuration";
-import Extractor from "./Extractor";
+import Component from "../Component";
 
-export default class HttpExtractor<T> extends Extractor<T> {
+export default class HttpExtractor<T> implements Component<T, T> {
 
-    url: string;
+    constructor(private config: {
+        url: string;
+        root: string | "";
+    }) { }
 
-    constructor(config: Configuration, url: string) {
-        super(config);
-        this.url = url;
-    }
-
-    async extract(): Promise<T[]> {
-        const data = await axios.get(this.url)
-            .then((res) => res.data)
+    async process(): Promise<T[]> {
+        const data = await axios.get(this.config.url)
+            .then((res) => this.config.root.length > 0 ? res.data[this.config.root] : res.data)
             .catch((e) => {
                 log("ERROR", e);
             });

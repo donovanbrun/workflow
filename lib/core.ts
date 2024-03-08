@@ -1,12 +1,27 @@
-import Configuration from "./core/Configuration";
 import Orchestrator from "./core/Orchestrator";
-import Pipeline from "./core/Pipeline";
-import Extractor from "./core/extractors/Extractor";
-import Loader from "./core/loaders/Loader";
-import Transformer from "./core/transformers/Transformer";
+import HttpExtractor from "./core/extractors/HttpExtractor";
+import CsvLoader from "./core/loaders/CsvLoader";
+import JsonLoader from "./core/loaders/JsonLoader";
+import PostgresLoader from "./core/loaders/PostgresLoader";
+import Pipeline from "./core/pipeline/Pipeline";
+import MergeAdapter from "./core/adapters/MergeAdapter";
+import SubPipelineAdapter from "./core/adapters/SubPipelineAdapter";
+import ParallelizeAdapter from "./core/adapters/ParallelizeAdapter";
+import Component from "./core/Component";
+import PipelineFactory from "./core/pipeline/PipelineFactory";
+import Controller from "./core/Controller";
 
 export {
-    Configuration,
-    Extractor, Loader, Orchestrator, Pipeline, Transformer
+    CsvLoader,
+    HttpExtractor,
+    JsonLoader,
+    Orchestrator,
+    PostgresLoader,
+    Pipeline,
+    MergeAdapter,
+    SubPipelineAdapter,
+    Component,
+    ParallelizeAdapter,
+    PipelineFactory,
+    Controller
 };
-

@@ -1,104 +1,91 @@
-import express from 'express';
-import 'module-alias/register';
-import cron from 'node-cron';
-import { log, Orchestrator } from "workflow-etl";
-import { globalConfig } from "./config/global";
-import OnePiece from './onePiece/one-piece';
-import Optc from './optc/optc';
-import SyncNotionOrganizr from './syncNotionOrganizr/sync-notion-organizr';
+import { Controller, CsvLoader, HttpExtractor, JsonLoader, log, MergeAdapter, Orchestrator, ParallelizeAdapter, Pipeline, PipelineFactory } from "workflow-etl";
 
-const app = express();
-const test = globalConfig.test == "true";
+// Define types
+type RawProduct = {
+    id: number;
+    title: string;
+    description: string;
+    price: number;
+    discountPercentage: number;
+    rating: number;
+    stock: number;
+    brand: string;
+    category: string;
+    thumbnail: string;
+    images: string[];
+};
 
-const router = express.Router();
-app.use(router);
+type Product = {
+    id: number;
+    title: string;
+    price: number;
+    realPrice: number;
+    rating: number;
+};
 
-// Basic auth
-app.use((req, res, next) => {
-    const auth = { login: globalConfig.auth.login, password: globalConfig.auth.password }
-    const b64auth = (req.headers.authorization || '').split(' ')[1] || ''
-    const [login, password] = Buffer.from(b64auth, 'base64').toString().split(':')
-    if (login && password && login === auth.login && password === auth.password) {
-        return next()
-    }
-    res.sendStatus(401);
-})
+// Define extractors, transformers and loaders
+const extractors = [
+    new MergeAdapter([
+        new HttpExtractor<RawProduct>({
+            url: "https://dummyjson.com/products",
+            root: "products"
+        }),
+        new HttpExtractor<RawProduct>({
+            url: "https://dummyjson.com/products",
+            root: "products"
+        }),
+    ])
+];
 
-const orchestrators: Orchestrator[] = [
-    new Orchestrator(
-        "sync-notion-organizr",
-        "Import of notion tasks into organizr database",
-        SyncNotionOrganizr,
-        require('./syncNotionOrganizr/controller'),
-        "/api/data/tasks",
-        '* 0 * * *',
-        globalConfig
-    ),
-    new Orchestrator(
-        "one-piece",
-        "Fetch one piece devil fruits and store them in a db",
-        OnePiece,
-        null,
-        "",
-        '* 0 * * *',
-        globalConfig
-    ),
-    new Orchestrator(
-        "optc",
-        "Fetch one piece characters and store to a json file and to mongodb",
-        Optc,
-        require('./optc/controller'),
-        "/api/data/optc",
-        '* 0 * * *',
-        globalConfig
-    ),
+const transformers = [
+    (data: RawProduct[]) => data.map((d: RawProduct, i: number) => {
+        return {
+            id: i,
+            title: d.title,
+            price: d.price,
+            realPrice: Math.floor(d.price * (1 - d.discountPercentage / 100)),
+            rating: d.rating
+        }
+    }),
 ]
 
-if (test) {
-    console.log("TEST");
-    testAll();
-}
-else {
-    orchestrators.forEach((orchestrator: Orchestrator) => {
-        const pipeline = orchestrator.process;
-        cron.schedule(orchestrator?.cron, () => {
-            log('INFO', orchestrator?.name + " started by cron")
-            pipeline.process()
-        })
-        log('INFO', orchestrator?.name + " schedule on : " + orchestrator?.cron)
+const loaders = [
+    new ParallelizeAdapter([
+        new CsvLoader<Product>({
+            path: "data/customers.csv",
+            columns: [
+                "id",
+                "title",
+                "price",
+                "realPrice",
+                "rating"
+            ]
+        }),
+        new JsonLoader<Product>({
+            path: "data/customers.json"
+        }),
+    ])
+]
 
-        app.post('/api/job/' + orchestrator?.name, function (req: any, res: any) {
-            pipeline.process()
-            return res.send(orchestrator?.name + ' started')
-        })
-        log('INFO', orchestrator?.name + " api create on : " + '/api/job/' + orchestrator?.name)
+// Create pipeline
+const pipeline = Pipeline.create([
+    ...extractors,
+    ...transformers,
+    ...loaders,
+])
 
-        if (orchestrator?.controller) {
-            router.use(orchestrator?.path, orchestrator?.controller);
-        }
-    })
+// Run pipeline
+pipeline.process().then(() => {
+    console.log("Pipeline finished")
+}).catch((error) => {
+    console.error("Pipeline failed", error)
+});
 
-    app.get('/api/list/', function (req: any, res: any) {
-        return res.send(orchestrators.map(orchestrator => {
-            return {
-                name: orchestrator.name,
-                description: orchestrator.description,
-                pipeline: '/api/job/' + orchestrator.name,
-                controller: orchestrator.path,
-            }
-        }))
-    })
+// Create orchestrator
+const orchestrator = new Orchestrator("example", "Example orchestrator", pipeline, "0 0 0 0");
+//orchestrator.schedule();
 
-    app.listen('4000', function () {
-        log('INFO', 'Server listening on port 4000')
-    })
-}
-
-async function testAll() {
-    const syncNotionOrganizr = new SyncNotionOrganizr("sync-notion-organizr", globalConfig);
-    const onePiece = new OnePiece("one-piece", globalConfig);
-    const optc = new Optc("optc", globalConfig);
-    await syncNotionOrganizr.process();
-    await onePiece.process();
-    await optc.process();
-}
+// Create Controller
+const controller = new Controller(pipeline, "example");
+controller.enableApi();
+Controller.start(3000);

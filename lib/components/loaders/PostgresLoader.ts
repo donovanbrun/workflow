@@ -1,7 +1,7 @@
-import { postgres } from "../../../lib/utils";
-import Component from "../Component";
+import { postgres } from "../../utils";
+import Component from "../../core/Component";
 
-export default class PostgresLoader implements Component<any,any> {
+export default class PostgresLoader implements Component<any, any> {
 
     constructor(private config: {
         host: string;
@@ -11,7 +11,7 @@ export default class PostgresLoader implements Component<any,any> {
         database: string;
         table: string;
         columns: string[];
-    }) {}
+    }) { }
 
     async process(data: any[]): Promise<any> {
         await postgres.clearTable(this.config.host, this.config.port, this.config.user, this.config.password, this.config.database, this.config.table)

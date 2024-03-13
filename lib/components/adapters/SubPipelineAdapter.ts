@@ -1,5 +1,5 @@
-import Component from "../Component";
-import { DataComponent } from "../pipeline/Pipeline";
+import Component from "../../core/Component";
+import { DataComponent } from "../../core/Pipeline";
 
 export default class SubPipelineAdapter implements Component<any, any> {
 

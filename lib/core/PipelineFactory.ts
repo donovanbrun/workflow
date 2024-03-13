@@ -1,5 +1,5 @@
-import MergeAdapter from "../adapters/MergeAdapter";
-import ParallelizeAdapter from "../adapters/ParallelizeAdapter";
+import MergeAdapter from "../components/adapters/MergeAdapter";
+import ParallelizeAdapter from "../components/adapters/ParallelizeAdapter";
 import Pipeline, { DataComponent } from "./Pipeline";
 
 export default class PipelineFactory {

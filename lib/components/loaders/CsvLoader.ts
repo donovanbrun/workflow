@@ -1,6 +1,6 @@
 import { stringify } from 'csv-stringify';
 import fs from 'fs';
-import Component from '../Component';
+import Component from '../../core/Component';
 
 export default class CsvLoader<T> implements Component<T, T> {
     path: string;

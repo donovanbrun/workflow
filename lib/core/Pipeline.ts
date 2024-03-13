@@ -1,4 +1,5 @@
-import Component from "../Component";
+import { log } from "../utils/log";
+import Component from "./Component";
 
 export type DataComponent = Component<any, any> | ((data: any) => any);
 
@@ -13,6 +14,7 @@ export default class Pipeline {
     }
 
     async process() {
+        const start = Date.now();
         let data: any[] = [];
 
         try {
@@ -30,6 +32,8 @@ export default class Pipeline {
             return false;
         }
 
+        const end = Date.now();
+        log('INFO', `Pipeline finished in ${end - start}ms`);
         return true;
     }
 }

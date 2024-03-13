@@ -1,6 +1,6 @@
-import Component from "../Component";
+import Component from "../../core/Component";
 
-export default class JsonLoader<T> implements Component<T,T> {
+export default class JsonLoader<T> implements Component<T, T> {
     path: string;
 
     constructor(config: {

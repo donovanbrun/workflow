@@ -1,6 +1,6 @@
 import axios from "axios";
 import { log } from "../../utils/log";
-import Component from "../Component";
+import Component from "../../core/Component";
 
 export default class HttpExtractor<T> implements Component<T, T> {
 

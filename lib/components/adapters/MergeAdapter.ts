@@ -11,7 +11,7 @@ export default class MergeAdapter implements Component<any, any> {
         try {
             const res = Promise.all(this.components.map(async (component) => {
                 if (typeof component === 'function')
-                    return component(data);
+                    return await component(data);
                 else if ((component as Component<any, any>).process !== undefined)
                     return await (component as Component<any, any>).process(data);
                 else

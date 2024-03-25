@@ -20,7 +20,7 @@ export default class Pipeline {
         try {
             for (let component of this.components) {
                 if (typeof component === 'function')
-                    data = component(data);
+                    data = await component(data);
                 else if ((component as Component<any, any>).process !== undefined)
                     data = await (component as Component<any, any>).process(data);
                 else

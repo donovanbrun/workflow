@@ -17,6 +17,6 @@
         "express": "^4.18.2",
         "node-cron": "^3.0.3",
         "typescript": "^5.3.3",
-        "workflow-etl": "^0.0.6"
+        "workflow-etl": "^0.0.9"
     }
 }

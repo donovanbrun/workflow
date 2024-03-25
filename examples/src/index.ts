@@ -28,11 +28,13 @@ const extractors = [
     new MergeAdapter([
         new HttpExtractor<RawProduct>({
             url: "https://dummyjson.com/products",
-            root: "products"
+            root: "products",
+            headers: {}
         }),
         new HttpExtractor<RawProduct>({
             url: "https://dummyjson.com/products",
-            root: "products"
+            root: "products",
+            headers: {}
         }),
     ])
 ];

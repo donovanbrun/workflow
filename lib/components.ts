@@ -6,6 +6,7 @@ import MergeAdapter from "./components/adapters/MergeAdapter";
 import SubPipelineAdapter from "./components/adapters/SubPipelineAdapter";
 import ParallelizeAdapter from "./components/adapters/ParallelizeAdapter";
 import JsonExtractor from "./components/extractors/JsonExtractor";
+import MongoDBLoader from "./components/loaders/MongoLoader";
 
 export {
     CsvLoader,
@@ -13,7 +14,8 @@ export {
     JsonExtractor,
     JsonLoader,
     PostgresLoader,
+    MongoDBLoader,
     MergeAdapter,
     SubPipelineAdapter,
-    ParallelizeAdapter
+    ParallelizeAdapter,
 };

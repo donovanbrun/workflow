@@ -1,43 +1,55 @@
 {
-  "name": "workflow-etl",
-  "version": "0.0.1",
-  "description": "",
-  "main": "build/index.js",
-  "private": false,
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npx tsc -p tsconfig.json && node build/index.js",
-    "build": "npx tsc -p tsconfig.json"
-  },
-  "author": "Donovan Brun",
-  "license": "ISC",
-  "_moduleAliases": {
-    "@etl": "build/etl"
-  },
-  "files": [
-    "build",
-    "README.md"
-  ],
-  "dependencies": {
-    "@notionhq/client": "^2.2.2",
-    "axios": "^0.27.2",
-    "csv": "^6.2.8",
-    "dotenv": "^16.0.2",
-    "express": "^4.18.1",
-    "fs": "^0.0.1-security",
-    "module-alias": "^2.2.3",
-    "mongodb": "^5.7.0",
-    "node-cron": "^3.0.2",
-    "pg": "^8.10.0",
-    "uuid": "^9.0.0"
-  },
-  "devDependencies": {
-    "@types/express": "^4.17.17",
-    "@types/jsdom": "^21.1.1",
-    "@types/node": "^20.4.1",
-    "@types/node-cron": "^3.0.8",
-    "@types/puppeteer": "^7.0.4",
-    "@types/uuid": "^9.0.2",
-    "typescript": "^5.3.3"
-  }
+    "name": "workflow-etl",
+    "version": "0.0.8",
+    "description": "",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "module": "dist/index.js",
+    "type": "module",
+    "private": false,
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js",
+            "require": "./dist/index.cjs"
+        },
+        "./package.json": "./package.json"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/donovanbrun/workflow.git"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "dev": "npx tsc -p tsconfig.json && node dist/index.js",
+        "build": "tsup"
+    },
+    "author": "Donovan Brun",
+    "license": "ISC",
+    "files": [
+        "dist",
+        "README.md"
+    ],
+    "dependencies": {
+        "@notionhq/client": "^2.2.2",
+        "axios": "^0.27.2",
+        "csv": "^6.2.8",
+        "dotenv": "^16.0.2",
+        "express": "^4.18.1",
+        "fs": "^0.0.1-security",
+        "module-alias": "^2.2.3",
+        "mongodb": "^5.7.0",
+        "node-cron": "^3.0.2",
+        "pg": "^8.10.0"
+    },
+    "devDependencies": {
+        "@types/express": "^4.17.17",
+        "@types/jsdom": "^21.1.1",
+        "@types/node": "^20.4.1",
+        "@types/node-cron": "^3.0.8",
+        "@types/puppeteer": "^7.0.4",
+        "@types/uuid": "^9.0.2",
+        "typescript": "^5.3.3",
+        "tsup": "^8.0.2"
+    }
 }

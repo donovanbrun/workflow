@@ -13,6 +13,8 @@ export default class Controller {
     private static router = express.Router();
     private static routes: any[] = [];
 
+    private launched = false;
+
     static init(login: string, password: string): Express {
         this.app.use('/api', this.router);
 
@@ -47,13 +49,22 @@ export default class Controller {
             uri: "/job/" + this.name
         });
         Controller.app.get('/job/' + this.name, (req: any, res: any) => {
+
+            if (this.launched) {
+                return res.send(this.name + ' already started');
+            }
+
             console.log(this.name + ' started');
+            this.launched = true;
+
             this.pipeline.process()
                 .then(() => {
                     console.log(this.name + ' finished');
                 }
                 ).catch((error) => {
                     console.error(this.name + ' failed', error);
+                }).finally(() => {
+                    this.launched = false;
                 });
             return res.send(this.name + ' started');
         });

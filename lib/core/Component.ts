@@ -1,3 +1,3 @@
-export default interface Component<T,U> {
+export default interface Component<T, U> {
     process(data: T[]): Promise<U[]>;
 }

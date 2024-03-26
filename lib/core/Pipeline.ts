@@ -5,9 +5,7 @@ export type DataComponent = Component<any, any> | ((data: any) => any);
 
 export default class Pipeline {
 
-    public constructor(public components: DataComponent[]) {
-        this.components = components;
-    }
+    public constructor(private components: DataComponent[]) { }
 
     static create(components: DataComponent[]) {
         return new Pipeline(components);

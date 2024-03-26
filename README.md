@@ -1,8 +1,6 @@
 # Workflow
 Data engineering package, to easily create data pipelines.
 
-# Table of content
-
 ## Table of Contents
 
 - [Getting started](#getting-started)
@@ -19,7 +17,7 @@ Data engineering package, to easily create data pipelines.
 
 ### Install the package
 ```
-npm install workflow-etl
+npm install workflow.io
 ```
 
 ### Composition of a pipeline

@@ -1,16 +1,17 @@
-import { log } from "../utils/log";
-import Component from "./Component";
-
-export type DataComponent = Component<any, any> | ((data: any) => any);
+import { LogType, log } from "../utils/log";
+import { DataComponent, processComponent } from "./Component";
 
 export default class Pipeline {
 
-    public constructor(public components: DataComponent[]) {
-        this.components = components;
+    public constructor(private components: DataComponent<any, any>[]) { }
+
+    static create(components: DataComponent<any, any>[] = []): Pipeline {
+        return new Pipeline(components);
     }
 
-    static create(components: DataComponent[]) {
-        return new Pipeline(components);
+    public addComponent(component: DataComponent<any, any>): Pipeline {
+        this.components.push(component);
+        return this;
     }
 
     async process() {
@@ -19,21 +20,18 @@ export default class Pipeline {
 
         try {
             for (let component of this.components) {
-                if (typeof component === 'function')
-                    data = await component(data);
-                else if ((component as Component<any, any>).process !== undefined)
-                    data = await (component as Component<any, any>).process(data);
-                else
-                    throw new Error("Invalid component");
+                data = await processComponent(component, data);
             }
+
+            const end = Date.now();
+            log(LogType.INFO, `Pipeline succeed in ${end - start}ms`);
+            return true;
         }
-        catch (e) {
-            console.error(e);
+        catch (e: any) {
+            log(LogType.ERROR, e);
+            const end = Date.now();
+            log(LogType.INFO, `Pipeline failed in ${end - start}ms`);
             return false;
         }
-
-        const end = Date.now();
-        log('INFO', `Pipeline finished in ${end - start}ms`);
-        return true;
     }
 }

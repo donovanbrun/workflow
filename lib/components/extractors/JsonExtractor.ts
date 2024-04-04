@@ -1,4 +1,4 @@
-import Component from "../../core/Component";
+import { Component } from "../../core/Component";
 import * as fs from 'fs';
 
 export default class JsonExtractor<T> implements Component<T, T> {

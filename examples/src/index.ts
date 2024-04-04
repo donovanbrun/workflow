@@ -1,4 +1,4 @@
-import { Controller, CsvLoader, HttpExtractor, JsonLoader, log, MergeAdapter, Orchestrator, ParallelizeAdapter, Pipeline, PipelineFactory } from "workflow-etl";
+import { Controller, CsvLoader, HttpExtractor, JsonLoader, MergeAdapter, Orchestrator, ParallelizeAdapter, Pipeline } from "workflow.io";
 
 // Define types
 type RawProduct = {

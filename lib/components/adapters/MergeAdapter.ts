@@ -1,28 +1,17 @@
-import Component from "../../core/Component";
-import { DataComponent } from "../../core/Pipeline";
+import { DataComponent, processComponent, Component } from "lib/core/Component";
 
 export default class MergeAdapter implements Component<any, any> {
 
-    constructor(private components: DataComponent[]) { }
+    constructor(
+        private components: DataComponent<any, any>[],
+        private mergeFunction: (data: any[][]) => any[] = (data: any[][]) => data.flat()
+    ) { }
 
-    async process(): Promise<any[]> {
-        let data: any[] = [];
+    async process(data: any[]): Promise<any[]> {
+        const res = Promise.all(this.components.map(async (component) => {
+            return await processComponent(component, data);
+        }));
 
-        try {
-            const res = Promise.all(this.components.map(async (component) => {
-                if (typeof component === 'function')
-                    return await component(data);
-                else if ((component as Component<any, any>).process !== undefined)
-                    return await (component as Component<any, any>).process(data);
-                else
-                    throw new Error("Invalid component");
-            }));
-
-            return (await res).flat();
-        }
-        catch (e) {
-            console.error(e);
-            return [];
-        }
+        return this.mergeFunction(await res);
     }
 }

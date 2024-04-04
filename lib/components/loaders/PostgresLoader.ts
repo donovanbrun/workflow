@@ -1,5 +1,5 @@
 import { postgres } from "../../utils";
-import Component from "../../core/Component";
+import { Component } from "../../core/Component";
 
 export default class PostgresLoader<T> implements Component<T, T> {
 

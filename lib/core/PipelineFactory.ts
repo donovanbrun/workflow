@@ -1,13 +1,14 @@
 import MergeAdapter from "../components/adapters/MergeAdapter";
 import ParallelizeAdapter from "../components/adapters/ParallelizeAdapter";
-import Pipeline, { DataComponent } from "./Pipeline";
+import { DataComponent } from "./Component";
+import Pipeline from "./Pipeline";
 
 export default class PipelineFactory {
 
     static createETLPipeline(
-        extractors: DataComponent[],
-        transformers: DataComponent[],
-        loaders: DataComponent[]) {
+        extractors: DataComponent<any, any>[],
+        transformers: DataComponent<any, any>[],
+        loaders: DataComponent<any, any>[]) {
         return new Pipeline([
             new MergeAdapter(extractors),
             ...transformers,
@@ -16,9 +17,9 @@ export default class PipelineFactory {
     }
 
     static createSimpleETLPipeline(
-        extractor: DataComponent,
-        transformer: DataComponent,
-        loader: DataComponent) {
+        extractor: DataComponent<any, any>,
+        transformer: DataComponent<any, any>,
+        loader: DataComponent<any, any>) {
         return new Pipeline([
             extractor,
             transformer,

@@ -1,4 +1,4 @@
-import Pipeline from "./Pipeline";
+import Pipeline from "../core/Pipeline";
 import express from 'express';
 import { Express } from 'express';
 

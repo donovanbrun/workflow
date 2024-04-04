@@ -1,28 +1,15 @@
-import Component from "../../core/Component";
-import { DataComponent } from "../../core/Pipeline";
+import { DataComponent, processComponent, Component } from "lib/core/Component";
 
 export default class SubPipelineAdapter implements Component<any, any> {
 
-    constructor(private components: DataComponent[]) { }
+    constructor(private components: DataComponent<any, any>[]) { }
 
     async process(data: any[]): Promise<any[]> {
-        let res: any[] = [];
+        let res: any[] = data;
 
-        try {
-            for (let component of this.components) {
-                if (typeof component === 'function')
-                    data = await component(data);
-                else if ((component as Component<any, any>).process !== undefined)
-                    data = await (component as Component<any, any>).process(data);
-                else
-                    throw new Error("Invalid component");
-            }
-
-            return res;
+        for (let component of this.components) {
+            res = await processComponent(component, res);
         }
-        catch (e) {
-            console.error(e);
-            return res;
-        }
+        return res;
     }
 }

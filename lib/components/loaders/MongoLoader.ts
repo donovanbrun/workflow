@@ -1,5 +1,5 @@
 import { mongodb } from "../../utils";
-import Component from "../../core/Component";
+import { Component } from "../../core/Component";
 
 export default class MongoDBLoader<T> implements Component<T, T> {
 

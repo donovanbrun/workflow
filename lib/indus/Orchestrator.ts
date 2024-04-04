@@ -1,4 +1,4 @@
-import Pipeline from "./Pipeline";
+import Pipeline from "../core/Pipeline";
 import cron from 'node-cron';
 
 export default class Orchestrator {

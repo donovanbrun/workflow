@@ -1,4 +1,4 @@
-import Component from "../../core/Component";
+import { Component } from "../../core/Component";
 
 export default class JsonLoader<T> implements Component<T, T> {
     path: string;

@@ -1,6 +1,6 @@
 import axios from "axios";
-import { log } from "../../utils/log";
-import Component from "../../core/Component";
+import { LogType, log } from "../../utils/log";
+import { Component } from "../../core/Component";
 
 export default class HttpExtractor<T> implements Component<T, T> {
 
@@ -14,7 +14,8 @@ export default class HttpExtractor<T> implements Component<T, T> {
         const data = await axios.get(this.config.url, this.config.headers ? { headers: this.config.headers } : {})
             .then((res) => this.config.root.length > 0 ? res.data[this.config.root] : res.data)
             .catch((e) => {
-                log("ERROR", e);
+                log(LogType.ERROR, e);
+                throw new Error("HttpExtractor failed");
             });
         return data;
     }

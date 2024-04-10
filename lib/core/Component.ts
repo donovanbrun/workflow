@@ -1,3 +1,7 @@
+/**
+ * Interface to implement to create a component.
+ * The pipeline will call the process method with the data to process.
+ */
 export interface Component<T, U> {
     process(data: T[]): Promise<U[]>;
 }

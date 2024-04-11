@@ -31,16 +31,22 @@ export default class Pipeline {
      */
     async process() {
         const start = Date.now();
-        let data: any[] = [];
+        // let data: any[] = [];
 
         try {
-            for (let component of this.components) {
-                data = await processComponent(component, data);
-            }
+            // for (let component of this.components) {
+            //     data = await processComponent(component, data);
+            // }
+
+            const data = await this.components.reduce(async (accPromise: Promise<any[]>, component) => {
+                const acc = await accPromise;
+                return processComponent(component, acc);
+            }, Promise.resolve([]));
 
             const end = Date.now();
             log(LogType.INFO, `Pipeline succeed in ${end - start}ms`);
             return true;
+
         }
         catch (e: any) {
             log(LogType.ERROR, e);

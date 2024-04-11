@@ -1,4 +1,4 @@
-import { DataComponent, processComponent, Component } from "lib/core/Component";
+import { DataComponent, processComponent, Component } from "../../core/Component";
 
 export default class SubPipelineAdapter implements Component<any, any> {
 

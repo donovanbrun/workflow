@@ -32,9 +32,10 @@
         "url": "git+https://github.com/donovanbrun/workflow.git"
     },
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "dev": "npx tsc -p tsconfig.json && node dist/index.js",
-        "build": "tsup"
+        "test": "cd test && npm run dev",
+        "dev": "npx tsc -p tsconfig.json && node dist/test/pipeline.spec.js",
+        "build": "tsup",
+        "examples": "cd examples && npm i && npm run dev"
     },
     "author": "Donovan Brun",
     "license": "ISC",
@@ -57,9 +58,11 @@
         "@types/jsdom": "^21.1.1",
         "@types/node": "^20.4.1",
         "@types/node-cron": "^3.0.8",
+        "@types/pg": "^8.11.5",
         "@types/puppeteer": "^7.0.4",
         "@types/uuid": "^9.0.2",
-        "typescript": "^5.3.3",
-        "tsup": "^8.0.2"
+        "ts-node": "^10.9.2",
+        "tsup": "^8.0.2",
+        "typescript": "^5.3.3"
     }
 }

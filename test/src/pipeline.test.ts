@@ -46,25 +46,24 @@ const expectedOutput = [
     }
 ];
 
-const pipeline = Pipeline.create([
-    (data) => input,
-    (data) => data.map((d, i) => {
-        return {
-            id: i,
-            title: d.title,
-            price: d.price,
-            realPrice: Math.floor(d.price * (1 - d.discountPercentage / 100)),
-            rating: d.rating
-        }
-    }),
-    (data: any[]) => {
-        assert.deepEqual(data, expectedOutput);
-        return data;
-    }
-]);
+export async function testPipeline() {
+    const pipeline = Pipeline.create([
+        (data) => data.map((d, i) => {
+            return {
+                title: d.title,
+                price: d.price,
+                realPrice: Math.floor(d.price * (1 - d.discountPercentage / 100)),
+                rating: d.rating
+            }
+        }),
+        (data: any[]) => data.map((d, i) => {
+            return {
+                id: i,
+                ...d
+            }
+        }),
+    ]);
 
-pipeline.process().then(() => {
-    console.log("Done");
-}).catch((err) => {
-    console.error(err);
-});
+    const output = await pipeline.process(input);
+    assert.deepEqual(output, expectedOutput);
+}

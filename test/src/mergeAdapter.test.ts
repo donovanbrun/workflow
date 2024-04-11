@@ -61,11 +61,12 @@ const expectedOutput = [
     }
 ];
 
-const mergeAdapter = new MergeAdapter([
-    (data) => input,
-    (data) => input
-])
+export async function testMergeAdapter() {
+    const mergeAdapter = new MergeAdapter([
+        (data) => input,
+        (data) => input
+    ])
 
-mergeAdapter.process([]).then((output) => {
+    const output = await mergeAdapter.process([]);
     assert.deepEqual(output, expectedOutput);
-});
+}

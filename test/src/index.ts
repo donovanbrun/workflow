@@ -1,6 +1,9 @@
+import { testPipeline } from './pipeline.test';
+import { testMergeAdapter } from './mergeAdapter.test';
+
 const tests = [
-    './pipeline.test',
-    './mergeAdapter.test'
+    testPipeline,
+    testMergeAdapter
 ];
 
 const res = {
@@ -8,15 +11,24 @@ const res = {
     failure: 0
 };
 
-tests.forEach(test => {
-    try {
-        require(test);
-        res.success++;
-    }
-    catch (e) {
-        console.error(e);
-        res.failure++;
-    }
-});
+const promises = Promise.all(
+    tests.map(async test => {
+        try {
+            await test();
+            res.success++;
+        }
+        catch (e) {
+            console.error(e);
+            res.failure++;
+        }
+    })
+);
 
-console.log(res);
+promises
+    .then(() => {
+        console.log(res);
+    })
+    .catch(() => {
+        console.error(res);
+        process.exitCode = 1;
+    });

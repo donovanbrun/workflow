@@ -1,11 +1,12 @@
-const { Client } = require('pg')
+import pkg from 'pg';
+const { Client } = pkg;
 
 export async function connect(host: string, port: string, user: string, password: string, database: string) {
     let client = new Client({
         user,
         password,
         host,
-        port,
+        port: Number.parseInt(port),
         database
     })
     await client.connect().catch((err: any) => { throw err })

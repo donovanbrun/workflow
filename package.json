@@ -32,8 +32,8 @@
         "url": "git+https://github.com/donovanbrun/workflow.git"
     },
     "scripts": {
-        "test": "cd test && npm run dev",
-        "dev": "npx tsc -p tsconfig.json && node dist/test/pipeline.spec.js",
+        "test": "cd test && npm i && npm run dev",
+        "dev": "npx tsc -p tsconfig.json && node dist/index.js",
         "build": "tsup",
         "examples": "cd examples && npm i && npm run dev"
     },

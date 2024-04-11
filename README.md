@@ -73,6 +73,8 @@ example.process().then(() => {
 });
 ```
 
+The ```process()``` function returns a promise of the output data, which resolves when the pipeline is finished, and rejects if an error occurs. It can take a array of data as parameter, which will be the initial data of the pipeline.
+
 ### Use component adapters
 
 To build more complexe pipelines, some components called adapters help to change the flow of the pipeline. For example, the MergeAdapter helps to process several components simultaneously and merged the returning data into a single list.
@@ -83,11 +85,13 @@ const example = Pipeline.create([
     new MergeAdapter([
         new HttpExtractor<RawProduct>({
             url: "https://dummyjson.com/products",
-            root: "products"
+            root: "products",
+            headers: {}
         }),
         new HttpExtractor<RawProduct>({
             url: "https://dummyjson.com/products",
-            root: "products"
+            root: "products",
+            headers: {}
         }),
     ]),
     (data: RawProduct[]) => data.map((d: RawProduct, i: number) => {
@@ -115,7 +119,11 @@ The difference here, is in the extraction of data, this pipeline will fetch data
 
 ### Use Pipeline Factory
 
-TODO
+The package provides a Pipeline Factory with some predefined pipelines :
+* ```PipelineFactory.createETLPipeline``` : creates a Extract, Transform, Load pipeline with multiple extractors, transformers and loaders
+* ```PipelineFactory.createSimpleETLPipeline``` : creates Extract, Transform, Load pipeline with only one extractor and one loader
+
+More predefined pipelines will be added in the future.
 
 ### Industrialise a pipeline
 

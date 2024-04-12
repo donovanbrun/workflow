@@ -6,7 +6,7 @@ export interface Component<T, U> {
     process(data: T[]): Promise<U[]>;
 }
 
-export type DataComponent<T, U> = Component<T, U> | ((data: T[]) => U[]);
+export type DataComponent<T, U> = Component<T, U> | ((data: T[]) => U[]) | ((data: T[]) => Promise<U[]>);
 
 export const processComponent = async<T, U>(component: DataComponent<T, U>, data: T[]): Promise<U[]> => {
     if (typeof component === 'function')

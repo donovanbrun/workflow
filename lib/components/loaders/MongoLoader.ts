@@ -12,9 +12,9 @@ export default class MongoDBLoader<T> implements Component<T, T> {
 
     async process(data: T[]): Promise<T[]> {
         if (this.config.clearCollection)
-            await mongodb.clearCollection(this.config.url, this.config.database, this.config.database);
+            await mongodb.clearCollection(this.config.url, this.config.database, this.config.collection);
 
-        await mongodb.insertMany(this.config.url, data, this.config.database, this.config.database);
+        await mongodb.insertMany(this.config.url, data, this.config.database, this.config.collection);
         return data;
     }
 }

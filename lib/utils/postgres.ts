@@ -1,5 +1,4 @@
-import pkg from 'pg';
-const { Client } = pkg;
+import { Client } from 'pg';
 
 export async function connect(host: string, port: string, user: string, password: string, database: string) {
     let client = new Client({
